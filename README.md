@@ -94,3 +94,7 @@ scripts/test-e2e.sh                  # builds the app, then drives it end to end
 `SOFTFOCUS_FAKE_IDLE` fixes the idle reading so the tests do not depend on someone touching the Mac. Without these variables the socket is never opened.
 
 > The end-to-end tests briefly dim your screens and show rest cards. Don't type while they run.
+
+## License
+
+MIT. See [LICENSE](LICENSE).
