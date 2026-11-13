@@ -38,8 +38,6 @@ Keys are ignored for the first 0.5 s, so you can't dismiss the card by accident.
 
 **Menu-bar icon.** The ring fills as work time passes. A solid dot means resting, a slashed ring means reminders are off, and a dashed ring means you're away.
 
-<p align="center"><img src="docs/screenshots/menu-bar-icons.png" width="312" alt="Menu-bar icon states"></p>
-
 ## Settings
 
 <p align="center">
