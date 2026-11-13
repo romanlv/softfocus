@@ -82,7 +82,8 @@ extension EndToEndTests {
         let (s, ui) = try app.waitFor("first launch") { _, ui in ui.settingsWindowVisible }
         #expect(s.phase == "working")
         #expect(approx(s.secondsUntilRest, 20 * 60, tolerance: 3))
-        #expect(ui.statusItemVisible && ui.activationPolicy == "accessory")
+        // Settings is open, so the app has a Dock icon for now.
+        #expect(ui.statusItemVisible && ui.activationPolicy == "regular")
         // Reads the real login item without touching it.
         #expect(ui.loginItem == .disabled)
         // Standard limits apply outside testing mode.

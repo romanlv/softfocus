@@ -212,3 +212,24 @@ struct ControlChannelTests {
         #expect(back == req)
     }
 }
+
+@Suite("Login item problems")
+struct LoginItemProblemTests {
+    struct Failure: LocalizedError { var errorDescription: String? { "Invalid argument" } }
+
+    @Test func movedOrDeletedApp() {
+        let m = LoginItemProblem.message(for: Failure(), appPath: "/Users/x/old/Softfocus.app", appExists: false)
+        #expect(m.contains("moved or deleted"))
+    }
+
+    @Test func translocatedApp() {
+        let m = LoginItemProblem.message(for: Failure(),
+            appPath: "/private/var/folders/ab/T/AppTranslocation/1234/d/Softfocus.app", appExists: true)
+        #expect(m.contains("Applications folder"))
+    }
+
+    @Test func otherErrorsShowTheSystemReason() {
+        let m = LoginItemProblem.message(for: Failure(), appPath: "/Applications/Softfocus.app", appExists: true)
+        #expect(m == "Could not change the login item: Invalid argument")
+    }
+}

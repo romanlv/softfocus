@@ -84,6 +84,7 @@ public final class AppCoordinator: NSObject, NSApplicationDelegate {
         settingsModel.onChange = { [unowned self] in updateSettings($0) }
         settingsModel.onOpenLoginItems = { [unowned self] in loginItem.openSystemSettings() }
         settingsWindow.onShow = { [unowned self] in refreshLoginItem() }
+        settingsWindow.onClose = { [unowned self] in applyAppearance(cycle.settings) }
         // The user may have changed the login item in System Settings meanwhile.
         NotificationCenter.default.addObserver(forName: NSApplication.didBecomeActiveNotification,
                                                object: nil, queue: .main) { [weak self] _ in
@@ -285,7 +286,8 @@ public final class AppCoordinator: NSObject, NSApplicationDelegate {
     }
 
     private func applyAppearance(_ s: Settings) {
-        NSApp.setActivationPolicy(s.showInDock ? .regular : .accessory)
+        // While Settings is open the app keeps a Dock icon, or macOS may not let it take the focus.
+        NSApp.setActivationPolicy(s.showInDock || settingsWindow.isVisible ? .regular : .accessory)
         statusItem?.isVisible = s.showInMenuBar
     }
 
@@ -297,7 +299,9 @@ public final class AppCoordinator: NSObject, NSApplicationDelegate {
             if on { try loginItem.register() } else { try loginItem.unregister() }
             settingsModel.loginItemMessage = nil
         } catch {
-            settingsModel.loginItemMessage = "Could not change the login item: \(error.localizedDescription)"
+            let app = Bundle.main.bundleURL
+            settingsModel.loginItemMessage = LoginItemProblem.message(
+                for: error, appPath: app.path, appExists: FileManager.default.fileExists(atPath: app.path))
         }
         refreshLoginItem(keepMessage: true)
     }

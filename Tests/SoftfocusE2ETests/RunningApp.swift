@@ -206,6 +206,16 @@ enum ScreenState {
 
     static var isUsable: Bool { !isLocked && CGDisplayIsAsleep(CGMainDisplayID()) == 0 }
 
+    /// Another Softfocus (yours, not the test's) is showing a rest: its overlay covers the
+    /// screen and holds the focus, so window tests would only measure that.
+    static var otherRestOnScreen: Bool {
+        let windows = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID) as? [[String: Any]] ?? []
+        return windows.contains {
+            ($0[kCGWindowOwnerName as String] as? String) == "Softfocus"
+                && ($0[kCGWindowLayer as String] as? Int ?? 0) >= Int(CGWindowLevelForKey(.screenSaverWindow)) - 2
+        }
+    }
+
     /// For tests that drive windows through the accessibility API.
-    static var canDriveUI: Bool { isUsable && AXDriver.isTrusted }
+    static var canDriveUI: Bool { isUsable && AXDriver.isTrusted && !otherRestOnScreen }
 }

@@ -4,7 +4,7 @@ import Foundation
 import SoftfocusCore
 import Testing
 
-private let axReason: Comment = "needs an unlocked, awake screen and your terminal allowed under System Settings › Privacy & Security › Accessibility"
+private let axReason: Comment = "needs an unlocked, awake screen and your terminal allowed under System Settings › Privacy & Security › Accessibility, with no other Softfocus rest on screen"
 
 /// The Settings window, driven through its real controls via the accessibility API.
 extension EndToEndTests {
@@ -124,11 +124,14 @@ extension EndToEndTests {
         try app.waitFor("no menu bar icon") { _, ui in !ui.statusItemVisible }
         #expect(!ax.exists(SettingsID.headlessNote))
         try ax.press(SettingsID.dock)
-        try app.waitFor("headless") { s, ui in s.settings.isHeadless && ui.activationPolicy == "accessory" }
+        // The Dock icon stays while Settings is open; the choice applies when it closes.
+        try app.waitFor("headless") { s, ui in s.settings.isHeadless && ui.activationPolicy == "regular" }
         #expect(eventually { ax.exists(SettingsID.headlessNote) })
         try ax.press(SettingsID.menuBar)
         try app.waitFor("menu bar back") { _, ui in ui.statusItemVisible }
         #expect(eventually { !ax.exists(SettingsID.headlessNote) })
+        try ax.closeWindow(SettingsID.window)
+        try app.waitFor("menu bar only after closing") { _, ui in !ui.settingsWindowVisible && ui.activationPolicy == "accessory" }
     }
 
     @Test(.enabled(if: ScreenState.canDriveUI, axReason))

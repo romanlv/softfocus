@@ -324,6 +324,8 @@ final class SettingsWindowController {
 
     var isVisible: Bool { window?.isVisible ?? false }
     var onShow: (() -> Void)?
+    /// Called after the window closes, so the app can go back to its usual Dock setting.
+    var onClose: (() -> Void)?
 
     func show() {
         onShow?()
@@ -355,13 +357,28 @@ final class SettingsWindowController {
             w.center()
             // Ending editing on close commits half-typed values (the field commits on focus loss).
             NotificationCenter.default.addObserver(forName: NSWindow.willCloseNotification, object: w, queue: .main) { _ in
-                MainActor.assumeIsolated { _ = w.makeFirstResponder(nil) }
+                MainActor.assumeIsolated {
+                    _ = w.makeFirstResponder(nil)
+                    DispatchQueue.main.async { [weak self] in self?.onClose?() }
+                }
             }
             window = w
             self.tabs = tabs
         }
-        NSApp.activate()
-        window?.makeKeyAndOrderFront(nil)
+        bringToFront()
+        // Called from the menu-bar menu, macOS can turn the activation down while the menu
+        // is still closing, leaving the window behind the front app. Ask again once it has.
+        DispatchQueue.main.async { [weak self] in self?.bringToFront() }
+    }
+
+    private func bringToFront() {
+        guard let window else { return }
+        // macOS often refuses to activate a menu-bar-only app, so while Settings is open
+        // the app is a regular one with a Dock icon. onClose restores the user's choice.
+        if NSApp.activationPolicy() != .regular { NSApp.setActivationPolicy(.regular) }
+        NSApp.activate(ignoringOtherApps: true)
+        window.makeKeyAndOrderFront(nil)
+        window.orderFrontRegardless()
     }
 
     var windowNumber: Int? { window?.windowNumber }

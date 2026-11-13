@@ -261,3 +261,17 @@ public enum ExternalCommand: Equatable, Sendable {
         }
     }
 }
+
+/// Explains a failed login-item change. macOS registers the app at the path it runs
+/// from, so the common failures are about where the app is, not the request itself.
+public enum LoginItemProblem {
+    public static func message(for error: Error, appPath: String, appExists: Bool) -> String {
+        if !appExists {
+            return "Softfocus was moved or deleted while it was running. Quit it, then open it again from its new place."
+        }
+        if appPath.contains("/AppTranslocation/") {
+            return "macOS is running Softfocus from a temporary copy. Move it to the Applications folder, then open it again."
+        }
+        return "Could not change the login item: \(error.localizedDescription)"
+    }
+}

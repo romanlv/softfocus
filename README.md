@@ -79,6 +79,7 @@ scripts/test-e2e.sh                  # builds the app, then drives it end to end
   - that hook scripts actually ran
   - that settings persist across a relaunch
   - Dock and menu-bar visibility, the URL commands, and quitting
+  - that Settings opened from the menu-bar menu comes to the front on the first click, even with another app in front
   - open-at-login: registering, approval needed, errors, and changes made in System Settings
 
   Renders of the rest card and of each Settings tab are saved to `build/e2e-artifacts/`, and `swift test` writes card previews to `build/previews/`.
