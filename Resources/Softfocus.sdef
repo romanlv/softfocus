@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dictionary SYSTEM "file://localhost/System/Library/DTDs/sdef.dtd">
+<dictionary title="Softfocus Terminology" xmlns:xi="http://www.w3.org/2003/XInclude">
+	<xi:include href="file:///System/Library/ScriptingDefinitions/CocoaStandard.sdef" xpointer="xpointer(/dictionary/suite[@name='Standard Suite'])"/>
+	<suite name="Softfocus Suite" code="Sfcs" description="Control rest reminders.">
+		<command name="rest now" code="SfcsRNow" description="Start a rest immediately.">
+			<cocoa class="SoftfocusRestNowCommand"/>
+		</command>
+		<command name="finish rest" code="SfcsFnsh" description="End the current rest (not allowed early in strict mode).">
+			<cocoa class="SoftfocusFinishCommand"/>
+		</command>
+		<command name="snooze" code="SfcsSnze" description="Postpone the next rest, or close the current one and come back later.">
+			<cocoa class="SoftfocusSnoozeCommand"/>
+			<parameter name="for" code="Mins" type="integer" optional="yes" description="Minutes (default 1).">
+				<cocoa key="minutes"/>
+			</parameter>
+		</command>
+		<command name="restart countdown" code="SfcsRsrt" description="Start the work countdown again from the full interval.">
+			<cocoa class="SoftfocusRestartCommand"/>
+		</command>
+		<class-extension extends="application" description="Softfocus's top-level scripting object.">
+			<property name="breaks enabled" code="SfEn" type="boolean" access="rw" description="Whether rest reminders are on.">
+				<cocoa key="breaksEnabled"/>
+			</property>
+			<property name="seconds until rest" code="SfSc" type="real" access="r" description="Seconds until the next rest, or -1 when not counting down.">
+				<cocoa key="secondsUntilRest"/>
+			</property>
+			<property name="rest phase" code="SfPh" type="text" access="r" description="off, working, resting, restDone, away (asleep, locked, screen saver) or idle (no input for a while).">
+				<cocoa key="restPhase"/>
+			</property>
+		</class-extension>
+	</suite>
+</dictionary>
